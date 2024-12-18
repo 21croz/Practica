@@ -33,7 +33,7 @@ button_style = {
 
 def open_file():
     """
-    Abre un archivo excel
+    Abre un archivo excel.
     """
     global df
     global options
@@ -49,7 +49,8 @@ def open_file():
 
 def reset_combobox():
     """
-    Crea nuevamente los cuadros para seleccionar las variables de los encabezados del archivo
+    Crea nuevamente los cuadros para seleccionar las variables
+    de los encabezados del archivo.
     """
     global combobox_x
     global combobox_y
@@ -78,7 +79,7 @@ def graph_3d():
     Crea un gráfico en 3 dimensiones usando las
     columnas x, y, z, ley del archivo importado,
     además. Hecho mediante el paquete
-    matplotlib
+    matplotlib.
     """
     global frame_graph
 
@@ -108,7 +109,7 @@ def graph_3d():
 
 def graph_footp():
     """
-    Crea el grafico en 2D del footprint
+    Crea el grafico en 2D del footprint.
     """
     for widget in frame_graph.winfo_children():
         widget.destroy()
@@ -132,15 +133,43 @@ def graph_footp():
     canvas_footprint_graph.get_tk_widget().pack(fill = 'both', expand=True)
 
 def filter_value():
+    """
+    Filtra los bloques con un valor 'antes_max' igual a 1,
+    es decir, los que serán económicamente rentables de
+    extraer.
+    """
     global df
     global original_df
 
     df = df.loc[df['antes_max'] > 0]
 
 def iterations():
-    def length_product(list):
+    """
+    Realiza iteraciones dentro de un intervalo, variando
+    el precio del cobre, costo de mina, costo de planta,
+    tasa de descuento, recuperación y costo de refinación
+    y venta.
+    Los archivos creados tienen los campos:
+    * x: Coordenada x.
+    * y: Coordenada y.
+    * z: Coordenada z.
+    * ley: Porcentaje de cobre de cada bloque
+    * antes_max: 
+    * periodo: Año en el que se extraerá el bloque
+    * valor: Ingreso que se obtendrá al vender el bloque en el instante 0.
+    * VAN: Ingreso descontado tras extraer el bloque
+
+    Luego de definir los archivos, llama a la función save_csv().
+    """
+    def length_product(lista: list):
+        """
+        Función de ayuda para la barra de progreso.\n
+        Calcula la cantidad de archivos que creará la funcion
+        iterations(), en base a eso, se define después el
+        incremento de la barra de progreso.
+        """
         total_length = 1
-        for item in list:
+        for item in lista:
             total_length = total_length*len(item)
         return total_length
 
@@ -225,6 +254,9 @@ def iterations():
     progress_bar['value'] = 0
 
 def save_csv(df, file_name):
+    """
+    Guarda los archivos hechos en las iteraciones
+    """
     folder = "iteraciones"
     if not os.path.exists(folder):
         os.makedirs(folder)
