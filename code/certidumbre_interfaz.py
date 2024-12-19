@@ -20,16 +20,22 @@ label_style = {
     'font': ('Arial', 12)
 }
 button_style = {
-    'bg': '#4a5cff',
-    'fg': '#ffffff',
-    'width': 15,
-    'font': ('Courier New', 14),
+    'bg': '#37d3ff',
+    'fg': '#000000',
+    'width': 16,
+    'font': ('Arial', 10),
     'border': 0,
     'cursor': 'hand2'
 }
 entry_style = {
     'width': 5,
     'justify': 'center'
+}
+button_frame_style = {
+    'highlightbackground': "#3c93c9",
+    'highlightcolor': "#3c93c9",
+    'highlightthickness': 3,
+    'bd': 0
 }
 
 
@@ -75,6 +81,22 @@ def reset_combobox():
 
     combobox_cu = ttk.Combobox(frame_cu, values = options, state='readonly', width = 10)
     combobox_cu.pack(side='left')
+
+def mid_list(lst: list):
+    """
+    Esta función encuentra el termino del medio en una lista de dimensión n.\n
+    * Si n es impar, se encuentra el valor central.
+    * Si n es par, se encuentra el valor izquierdo del centro.\n
+    Se usa para encontrar el mid_case a la hora de hacer las iteraciones.
+    """
+    length = len(lst)
+
+    if length % 2 != 0:
+        middle_index = length//2
+        return lst[middle_index]
+    
+    first_middle_index = length // 2 - 1
+    return lst[first_middle_index]
 
 def graph_3d():
     """
@@ -298,7 +320,14 @@ def iterations():
 
                             csv_name = f"pr{pr}mc{mco}pc{pco}d{d}r{r}sc{sc}.csv"
 
-                            save_csv(df_saved, csv_name)
+                            if sell_cost == min(sell_cost_range) and rec == max(recovery_range) and i == min(discount_rate_range) and pc == min(plant_cost_range) and mc == min(mine_cost_range) and price == max(price_range):
+                                worst_mid_best_case(df_saved, "BEST.csv")
+                            elif sell_cost == max(sell_cost_range) and rec == min(recovery_range) and i == max(discount_rate_range) and pc == max(plant_cost_range) and mc == max(mine_cost_range) and price == min(price_range):
+                                worst_mid_best_case(df_saved, "WORST.csv")
+                            elif sell_cost == mid_list(sell_cost_range) and rec == mid_list(recovery_range) and i == mid_list(discount_rate_range) and pc == mid_list(plant_cost_range) and mc == mid_list(mine_cost_range) and price == mid_list(price_range):
+                                worst_mid_best_case(df_saved, "MIDCASE.csv")
+                            else:
+                                save_csv(df_saved, csv_name)
                             progress_bar['value'] = progress_index
                             percentage.set(f"{(progress_index/iterations_number)*100:.2f} %")
                             root.update_idletasks()
@@ -319,6 +348,15 @@ def clear_files():
     tener los elimina para luego almacenar las nuevas iteraciones.
     """
     path = "iteraciones"
+    files = os.listdir(path)
+
+    if files:
+        for folder_file in files:
+            file_path = os.path.join(path, folder_file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+    
+    path = "iteraciones/cases"
     files = os.listdir(path)
 
     if files:
@@ -358,6 +396,8 @@ def calculate_block_value(price:float, selling_cost:float, tonnage:float, recove
 def iterations_operations(df_saved):
     """
     Esta funcion establece las operaciones que se harán en cada iteración sobre el dataframe.
+    * Verifica si el valor de un bloque es positivo o negativo, si es positivo, escribe un 1 en
+    la columna 'antes_max'
     """
     df_saved['antes_max'] = (df_saved['valor'] > 0).astype(int)
 
@@ -367,10 +407,17 @@ def verify_iterations():
     al usuario sobre la cantidad de archivo y su tamaño total en el disco.
     """
     file_number = files_number()
-    answer = messagebox.askokcancel("Confirm", f"Se crearán {file_number} archivos. ({round((file_number*1000/1024)/1024, 2)} Gb).")
+    answer = messagebox.askokcancel("Confirm", f"Se crearán {file_number+3} archivos. ({round(((file_number+3)*1000/1024)/1024, 2)} Gb).")
     if answer:
         button_iterations.config(state='disabled')
         iterations()
+
+def worst_mid_best_case(df, file_name):
+    folder = "iteraciones/cases"
+    if not os.path.exists(folder):
+        os.makedirs(folder)
+    full_path = os.path.join(folder, file_name)
+    df.to_csv(full_path, index = False)
 
 
 root = tk.Tk()
@@ -553,15 +600,21 @@ entry_sellingcost_step.pack()
 
 frame_graph_buttons = tk.Frame(frame_sensitivity, bg = COLORFRAME1)
 frame_graph_buttons.pack()
-button_3d_graph = tk.Button(frame_graph_buttons, text='3D Graph', command=graph_3d, **button_style)
-button_3d_graph.pack(padx = 10, pady = 15, side = 'left')
-button_2d_graph = tk.Button(frame_graph_buttons, text='Footprint graph', command=graph_footp, **button_style)
-button_2d_graph.pack(padx = 10, pady = 15, side='left')
+frame_button_3d_graph = tk.Frame(frame_graph_buttons, **button_frame_style)
+frame_button_3d_graph.pack(padx = 10, pady = 15, side = 'left')
+button_3d_graph = tk.Button(frame_button_3d_graph, text='3D Graph', command=graph_3d, **button_style)
+button_3d_graph.pack()
+frame_button_2d_graph = tk.Frame(frame_graph_buttons, **button_frame_style)
+frame_button_2d_graph.pack(padx = 10, pady = 15, side='left')
+button_2d_graph = tk.Button(frame_button_2d_graph, text='Footprint graph', command=graph_footp, **button_style)
+button_2d_graph.pack()
 
 frame_iterations = tk.Frame(frame_sensitivity, bg = COLORFRAME1)
 frame_iterations.pack()
-button_iterations = tk.Button(frame_iterations, text = 'Iterate', command = verify_iterations, **button_style)
-button_iterations.pack(pady=15)
+frame_button_iterations = tk.Frame(frame_iterations, **button_frame_style)
+frame_button_iterations.pack(pady=15)
+button_iterations = tk.Button(frame_button_iterations, text = 'Iterate', command = verify_iterations, **button_style)
+button_iterations.pack()
 progress_bar = ttk.Progressbar(frame_iterations, orient='horizontal', length = 200)
 progress_bar.pack()
 
