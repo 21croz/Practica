@@ -309,6 +309,7 @@ def iterations():
             r += 1
         sc += 1
     progress_bar['value'] = 0
+    percentage.set("0.00 %")
     button_iterations.config(state='normal')
 
 def clear_files():
