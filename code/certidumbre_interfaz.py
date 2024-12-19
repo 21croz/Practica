@@ -157,6 +157,12 @@ def length_product(lista: list):
         return total_length
 
 def files_number():
+    """
+    Esta función entrega el número de archivos que se crearán en las
+    iteraciones. El cálculo se hace en base al largo de los intervalos
+    que se elijan para los parámetros (precio, costo mina, costo
+    planta, etc.)
+    """
     global df
     global combobox_x
     global combobox_y
@@ -217,6 +223,7 @@ def iterations():
     Luego de definir los archivos, llama a la función save_csv().
     """
 
+    clear_files()
     global df
     global combobox_x
     global combobox_y
@@ -249,7 +256,7 @@ def iterations():
     recovery_range = np.arange(recovery_lower, recovery_upper + recovery_step, recovery_step)
     sell_cost_range = np.arange(sell_low, sell_upper + sell_step, sell_step)
 
-    progress_bar['maximum'] = length_product([
+    iterations_number = length_product([
         price_range,
         mine_cost_range,
         plant_cost_range,
@@ -257,6 +264,8 @@ def iterations():
         recovery_range,
         sell_cost_range
     ])
+
+    progress_bar['maximum'] = iterations_number
 
     progress_index = 1
     sc = 1
@@ -290,6 +299,7 @@ def iterations():
 
                             save_csv(df_saved, csv_name)
                             progress_bar['value'] = progress_index
+                            percentage.set(f"{(progress_index/iterations_number)*100:.2f} %")
                             root.update_idletasks()
                             progress_index += 1
                             pr += 1
@@ -300,6 +310,20 @@ def iterations():
         sc += 1
     progress_bar['value'] = 0
     button_iterations.config(state='normal')
+
+def clear_files():
+    """
+    Esta función verifica si la carpeta 'iteraciones' contiene archivos, en caso de
+    tener los elimina para luego almacenar las nuevas iteraciones.
+    """
+    path = "iteraciones"
+    files = os.listdir(path)
+
+    if files:
+        for folder_file in files:
+            file_path = os.path.join(path, folder_file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
 
 def save_csv(df, file_name):
     """
@@ -330,9 +354,16 @@ def calculate_block_value(price:float, selling_cost:float, tonnage:float, recove
     return income - outcome
 
 def iterations_operations(df_saved):
+    """
+    Esta funcion establece las operaciones que se harán en cada iteración sobre el dataframe.
+    """
     df_saved['antes_max'] = (df_saved['valor'] > 0).astype(int)
 
 def verify_iterations():
+    """
+    Luego de presionar el boton para realizar las iteraciones, se crea un mensaje que advierte
+    al usuario sobre la cantidad de archivo y su tamaño total en el disco.
+    """
     file_number = files_number()
     answer = messagebox.askokcancel("Confirm", f"Se crearán {file_number} archivos. ({round((file_number*1000/1024)/1024, 2)} Gb).")
     if answer:
@@ -531,5 +562,10 @@ button_iterations = tk.Button(frame_iterations, text = 'Iterate', command = veri
 button_iterations.pack(pady=15)
 progress_bar = ttk.Progressbar(frame_iterations, orient='horizontal', length = 200)
 progress_bar.pack()
+
+percentage = tk.StringVar()
+label_percentage = tk.Label(frame_iterations, textvariable=percentage, bg=COLORFRAME1, font=('Courier New', 10))
+label_percentage.pack(pady = 2)
+percentage.set("0.00 %")
 
 root.mainloop()
