@@ -7,6 +7,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import os
+from pathlib import Path
 
 original_df = None
 df = None
@@ -143,6 +144,60 @@ def filter_value():
 
     df = df.loc[df['antes_max'] > 0]
 
+def length_product(lista: list):
+        """
+        Función de ayuda para la barra de progreso.\n
+        Calcula la cantidad de archivos que creará la funcion
+        iterations(), en base a eso, se define después el
+        incremento de la barra de progreso.
+        """
+        total_length = 1
+        for item in lista:
+            total_length = total_length*len(item)
+        return total_length
+
+def files_number():
+    global df
+    global combobox_x
+    global combobox_y
+    global combobox_z
+    global combobox_cu
+
+    price_lower = float(entry_price_lower.get())
+    price_upper = float(entry_price_upper.get())
+    price_step = float(entry_price_step.get())
+    minecost_lower = float(entry_minecost_lower.get())
+    minecost_upper = float(entry_minecost_upper.get())
+    minecost_step = float(entry_minecost_step.get())
+    plantcost_lower = float(entry_plantcost_lower.get())
+    plantcost_upper = float(entry_plantcost_upper.get())
+    plantcost_step = float(entry_plantcost_step.get())
+    discount_lower = float(entry_discountrate_lower.get())
+    discount_upper = float(entry_discountrate_upper.get())
+    discount_step = float(entry_discountrate_step.get())
+    recovery_lower = float(entry_recovery_lower.get())
+    recovery_upper = float(entry_recovery_upper.get())
+    recovery_step = float(entry_recovery_step.get())
+    sell_low = float(entry_sellingcost_lower.get())
+    sell_upper = float(entry_sellingcost_upper.get())
+    sell_step = float(entry_sellingcost_step.get())
+
+    price_range = np.arange(price_lower, price_upper + price_step, price_step)
+    mine_cost_range = np.arange(minecost_lower, minecost_upper + minecost_step, minecost_step)
+    plant_cost_range = np.arange(plantcost_lower, plantcost_upper + plantcost_step, plantcost_step)
+    discount_rate_range = np.arange(discount_lower, discount_upper + discount_step, discount_step)
+    recovery_range = np.arange(recovery_lower, recovery_upper + recovery_step, recovery_step)
+    sell_cost_range = np.arange(sell_low, sell_upper + sell_step, sell_step)
+
+    return length_product([
+        price_range,
+        mine_cost_range,
+        plant_cost_range,
+        discount_rate_range,
+        recovery_range,
+        sell_cost_range
+    ])
+
 def iterations():
     """
     Realiza iteraciones dentro de un intervalo, variando
@@ -161,17 +216,6 @@ def iterations():
 
     Luego de definir los archivos, llama a la función save_csv().
     """
-    def length_product(lista: list):
-        """
-        Función de ayuda para la barra de progreso.\n
-        Calcula la cantidad de archivos que creará la funcion
-        iterations(), en base a eso, se define después el
-        incremento de la barra de progreso.
-        """
-        total_length = 1
-        for item in lista:
-            total_length = total_length*len(item)
-        return total_length
 
     global df
     global combobox_x
@@ -236,8 +280,11 @@ def iterations():
                                 'periodo': df['Period']
                             }
                             df_saved = pd.DataFrame(data_saved)
-                            df_saved['valor'] = (price - sell_cost)*rec*df_saved['ley']*2204.63 - (mc - pc)
-                            df_saved['VAN'] = df_saved['valor']/((1 + i)**df_saved['periodo'])
+                            # EL VOLUMEN DEL BLOQUE ES 10X10X10, SE ASUME DENSIDAD DE 2.7
+                            df_saved['valor'] = calculate_block_value(price, sell_cost, 1000*2.7, rec, df_saved['ley'], mc, pc)
+                            df_saved['valor_descontado'] = df_saved['valor']/((1 + i/100)**df_saved['periodo'])
+
+                            iterations_operations(df_saved)
 
                             csv_name = f"pr{pr}mc{mco}pc{pco}d{d}r{r}sc{sc}.csv"
 
@@ -252,6 +299,7 @@ def iterations():
             r += 1
         sc += 1
     progress_bar['value'] = 0
+    button_iterations.config(state='normal')
 
 def save_csv(df, file_name):
     """
@@ -263,8 +311,37 @@ def save_csv(df, file_name):
     full_path = os.path.join(folder, file_name)
     df.to_csv(full_path, index = False)
 
+def group_columns(df):
+    """
+    Esta función crea un diccionario de dataframes con cada fila del dataframe inicial.
+    Los dataframes creados tienen las mismas coordenadas x e y, de este modo se
+    puede realizar un análisis sobre cada columna (distinta cota o eje z). 
+    """
+    columns_filter = df.groupby(['x', 'y'])
+    column_dataframes = {group: group_df for group, group_df in columns_filter}
+    return column_dataframes
+
+def calculate_block_value(price:float, selling_cost:float, tonnage:float, recovery:int, grade:float, mine_cost:float, plant_cost:float):
+    """
+    Esta función calcula el beneficio que se obtendrá tras extraer un bloque
+    """
+    income = (price - selling_cost)*tonnage*(recovery/100)*(grade/100)*2204.63
+    outcome = (mine_cost + plant_cost)*tonnage
+    return income - outcome
+
+def iterations_operations(df_saved):
+    df_saved['antes_max'] = (df_saved['valor'] > 0).astype(int)
+
+def verify_iterations():
+    file_number = files_number()
+    answer = messagebox.askokcancel("Confirm", f"Se crearán {file_number} archivos. ({round((file_number*1000/1024)/1024, 2)} Gb).")
+    if answer:
+        button_iterations.config(state='disabled')
+        iterations()
+
 
 root = tk.Tk()
+root.title('Certidumbre')
 WINDOW_WIDTH = 1300
 WINDOW_HEIGHT = 800
 root.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}')
@@ -278,6 +355,11 @@ menu_file.add_command(label = 'Exit', command = root.quit)
 menu_bar.add_cascade(label = 'File', menu = menu_file)
 root.config(menu = menu_bar)
 
+# Creación de los dos frames principales de la interfaz.
+# El de la izquierda (1/4 de la ventana), donde están los
+# parámetros para graficar y hacer el análisis de sensibilidad.
+# Y el de la derecha, donde se crean los gráficos del modelo
+# de bloques y el gráfico del footprint.
 frame_sensitivity = tk.Frame(root, bg = COLORFRAME1, width=WINDOW_WIDTH // 4)
 frame_sensitivity.pack(side='left', fill='both')
 frame_graph = tk.Frame(root, bg = COLORFRAME2, width=WINDOW_WIDTH*3 // 4)
@@ -445,7 +527,7 @@ button_2d_graph.pack(padx = 10, pady = 15, side='left')
 
 frame_iterations = tk.Frame(frame_sensitivity, bg = COLORFRAME1)
 frame_iterations.pack()
-button_iterations = tk.Button(frame_iterations, text = 'Iterate', command = iterations, **button_style)
+button_iterations = tk.Button(frame_iterations, text = 'Iterate', command = verify_iterations, **button_style)
 button_iterations.pack(pady=15)
 progress_bar = ttk.Progressbar(frame_iterations, orient='horizontal', length = 200)
 progress_bar.pack()
