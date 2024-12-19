@@ -566,7 +566,7 @@ progress_bar = ttk.Progressbar(frame_iterations, orient='horizontal', length = 2
 progress_bar.pack()
 
 percentage = tk.StringVar()
-label_percentage = tk.Label(frame_iterations, textvariable=percentage, bg=COLORFRAME1, font=('Courier New', 10))
+label_percentage = tk.Label(frame_iterations, textvariable=percentage, bg=COLORFRAME1, fg='#ffffff', font=('Courier New', 10))
 label_percentage.pack(pady = 2)
 percentage.set("0.00 %")
 
