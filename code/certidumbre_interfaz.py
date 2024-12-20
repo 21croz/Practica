@@ -1,12 +1,12 @@
 import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
 import pandas as pd
 import matplotlib as plt
+import numpy as np
+import os
+from tkinter import filedialog, ttk, messagebox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from mpl_toolkits.mplot3d import Axes3D
-import numpy as np
-import os
 from pathlib import Path
 
 original_df = None
@@ -14,7 +14,7 @@ df = None
 options = []
 iterations_path = None
 cases_folder = None
-COLORFRAME1 = '#1f1f1f'
+COLORFRAME1 = '#404040'
 COLORFRAME2 = '#4f4f4f'
 label_style = {
     'bg': COLORFRAME1,
@@ -22,10 +22,10 @@ label_style = {
     'font': ('Arial', 12)
 }
 button_style = {
-    'bg': '#37d3ff',
+    'bg': '#ffad33',
     'fg': '#000000',
     'width': 16,
-    'font': ('Arial', 10),
+    'font': ('Arial', 11),
     'border': 0,
     'cursor': 'hand2'
 }
@@ -34,8 +34,8 @@ entry_style = {
     'justify': 'center'
 }
 button_frame_style = {
-    'highlightbackground': "#3c93c9",
-    'highlightcolor': "#3c93c9",
+    'highlightbackground': "#e68a00",
+    'highlightcolor': "#e68a00",
     'highlightthickness': 3,
     'bd': 0
 }
@@ -112,10 +112,9 @@ def graph_3d():
 
     filter_value()
 
-
     for widget in frame_graph.winfo_children():
         widget.destroy()
-    
+
     x_data = df.loc[:, combobox_x.get()].tolist()
     y_data = df.loc[:, combobox_y.get()].tolist()
     z_data = df.loc[:, combobox_z.get()].tolist()
@@ -461,28 +460,28 @@ frame_graph.pack(side='left', fill='both')
 frame_xyzcu = tk.Frame(frame_sensitivity, bg = COLORFRAME1)
 frame_xyzcu.pack()
 frame_x = tk.Frame(frame_xyzcu, bg = COLORFRAME1)
-frame_x.pack()
+frame_x.pack(pady = 3)
 frame_y = tk.Frame(frame_xyzcu, bg = COLORFRAME1)
-frame_y.pack()
+frame_y.pack(pady = 3)
 frame_z = tk.Frame(frame_xyzcu, bg = COLORFRAME1)
-frame_z.pack()
+frame_z.pack(pady = 3)
 frame_cu = tk.Frame(frame_xyzcu, bg = COLORFRAME1)
-frame_cu.pack()
+frame_cu.pack(pady = 3)
 
 label_x = tk.Label(frame_x, text='X coordinate', **label_style).pack(side='left')
-combobox_x = ttk.Combobox(frame_x, values = options, state='readonly', width = 10)
+combobox_x = ttk.Combobox(frame_x, values = options, state='readonly', width = 10, justify = 'center')
 combobox_x.pack(side='left')
 
 label_y = tk.Label(frame_y, text='Y coordinate', **label_style).pack(side='left')
-combobox_y = ttk.Combobox(frame_y, values = options, state='readonly', width = 10)
+combobox_y = ttk.Combobox(frame_y, values = options, state='readonly', width = 10, justify = 'center')
 combobox_y.pack(side='left')
 
 label_z = tk.Label(frame_z, text='Z coordinate', **label_style).pack(side='left')
-combobox_z = ttk.Combobox(frame_z, values = options, state='readonly', width = 10)
+combobox_z = ttk.Combobox(frame_z, values = options, state='readonly', width = 10, justify = 'center')
 combobox_z.pack(side='left')
 
 label_cu = tk.Label(frame_cu, text='Metal grade', **label_style).pack(side='left')
-combobox_cu = ttk.Combobox(frame_cu, values = options, state='readonly', width = 10)
+combobox_cu = ttk.Combobox(frame_cu, values = options, state='readonly', width = 10, justify = 'center')
 combobox_cu.pack(side='left')
 
 frame_price_general = tk.Frame(frame_sensitivity, bg = COLORFRAME1)
