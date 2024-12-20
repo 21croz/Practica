@@ -12,6 +12,8 @@ from pathlib import Path
 original_df = None
 df = None
 options = []
+iterations_path = None
+cases_folder = None
 COLORFRAME1 = '#1f1f1f'
 COLORFRAME2 = '#4f4f4f'
 label_style = {
@@ -54,6 +56,7 @@ def open_file():
         options = list(df)
     
     reset_combobox()
+    messagebox.showinfo("SUCCESS", "File loaded successfully")
 
 def reset_combobox():
     """
@@ -246,12 +249,13 @@ def iterations():
     Luego de definir los archivos, llama a la función save_csv().
     """
 
-    clear_files()
     global df
     global combobox_x
     global combobox_y
     global combobox_z
     global combobox_cu
+    global iterations_path
+    global cases_folder
 
     price_lower = float(entry_price_lower.get())
     price_upper = float(entry_price_upper.get())
@@ -321,13 +325,13 @@ def iterations():
                             csv_name = f"pr{pr}mc{mco}pc{pco}d{d}r{r}sc{sc}.csv"
 
                             if sell_cost == min(sell_cost_range) and rec == max(recovery_range) and i == min(discount_rate_range) and pc == min(plant_cost_range) and mc == min(mine_cost_range) and price == max(price_range):
-                                worst_mid_best_case(df_saved, "BEST.csv")
+                                worst_mid_best_case(df_saved, f"{cases_folder}/BEST.csv")
                             elif sell_cost == max(sell_cost_range) and rec == min(recovery_range) and i == max(discount_rate_range) and pc == max(plant_cost_range) and mc == max(mine_cost_range) and price == min(price_range):
-                                worst_mid_best_case(df_saved, "WORST.csv")
+                                worst_mid_best_case(df_saved, f"{cases_folder}/WORST.csv")
                             elif sell_cost == mid_list(sell_cost_range) and rec == mid_list(recovery_range) and i == mid_list(discount_rate_range) and pc == mid_list(plant_cost_range) and mc == mid_list(mine_cost_range) and price == mid_list(price_range):
-                                worst_mid_best_case(df_saved, "MIDCASE.csv")
+                                worst_mid_best_case(df_saved, f"{cases_folder}/MIDCASE.csv")
                             else:
-                                save_csv(df_saved, csv_name)
+                                save_csv(df_saved, f"{iterations_path}/{csv_name}")
                             progress_bar['value'] = progress_index
                             percentage.set(f"{(progress_index/iterations_number)*100:.2f} %")
                             root.update_idletasks()
@@ -342,12 +346,11 @@ def iterations():
     percentage.set("0.00 %")
     button_iterations.config(state='normal')
 
-def clear_files():
+def clear_files(path):
     """
     Esta función verifica si la carpeta 'iteraciones' contiene archivos, en caso de
     tener los elimina para luego almacenar las nuevas iteraciones.
     """
-    path = "iteraciones"
     files = os.listdir(path)
 
     if files:
@@ -356,12 +359,16 @@ def clear_files():
             if os.path.isfile(file_path):
                 os.remove(file_path)
     
-    path = "iteraciones/cases"
+    path2 = f"{path}/cases"
+    
+    if not os.path.exists(path2):
+        os.makedirs(path2)
+
     files = os.listdir(path)
 
     if files:
         for folder_file in files:
-            file_path = os.path.join(path, folder_file)
+            file_path = os.path.join(path2, folder_file)
             if os.path.isfile(file_path):
                 os.remove(file_path)
 
@@ -369,11 +376,7 @@ def save_csv(df, file_name):
     """
     Guarda los archivos hechos en las iteraciones
     """
-    folder = "iteraciones"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    full_path = os.path.join(folder, file_name)
-    df.to_csv(full_path, index = False)
+    df.to_csv(file_name, index = False)
 
 def group_columns(df):
     """
@@ -410,14 +413,24 @@ def verify_iterations():
     answer = messagebox.askokcancel("Confirm", f"Se crearán {file_number+3} archivos. ({round(((file_number+3)*1000/1024)/1024, 2)} Gb).")
     if answer:
         button_iterations.config(state='disabled')
+        path = select_iterations_path()
         iterations()
 
+def select_iterations_path():
+    global cases_folder
+    global iterations_path
+    
+    iterations_path = filedialog.askdirectory(title = "Folder to save iterations")
+    cases_folder = os.path.join(iterations_path, "cases")
+    clear_files(iterations_path)
+    clear_files(cases_folder)
+
 def worst_mid_best_case(df, file_name):
-    folder = "iteraciones/cases"
-    if not os.path.exists(folder):
-        os.makedirs(folder)
-    full_path = os.path.join(folder, file_name)
-    df.to_csv(full_path, index = False)
+    global cases_folder
+    
+    if not os.path.exists(cases_folder):
+        os.makedirs(cases_folder)
+    df.to_csv(file_name, index = False)
 
 
 root = tk.Tk()
