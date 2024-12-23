@@ -1,6 +1,7 @@
 import tkinter as tk
 import pandas as pd
-import matplotlib as plt
+import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 from tkinter import filedialog, ttk, messagebox
@@ -12,6 +13,9 @@ from pathlib import Path
 original_df = None
 df = None
 options = []
+options_footprint = []
+z_height_footprint = None
+dataframes_study_cases = []
 iterations_path = None
 cases_folder = None
 COLORFRAME1 = '#404040'
@@ -57,6 +61,7 @@ def open_file():
     
     reset_combobox()
     messagebox.showinfo("SUCCESS", "File loaded successfully")
+    button_graph_footprint.config(state='disabled')
 
 def reset_combobox():
     """
@@ -84,6 +89,25 @@ def reset_combobox():
 
     combobox_cu = ttk.Combobox(frame_cu, values = options, state='readonly', width = 10)
     combobox_cu.pack(side='left')
+
+def list_percentage(lst: list, num: int):
+    """
+    Esta funcion calcula el elemento en una posición dada por el numero
+    'num', el cual corresponderá a un porcentaje. Si 'num' es 25, la
+    función entregará el numero justo en el primer cuarto de los
+    elementos. Si 'num' es 0, entregará el primer elemento. Si 'num' es
+    100, entregará el último elemento.\n
+    Parámetros
+    """
+    if len(lst) == 0:
+        return
+    
+    if num not in [100, 0]:
+        return lst[len(lst)*num // 100]
+    elif num == 0:
+        return lst[0]
+    elif num == 100:
+        return lst[len(lst)-1]
 
 def mid_list(lst: list):
     """
@@ -327,8 +351,12 @@ def iterations():
                                 worst_mid_best_case(df_saved, f"{cases_folder}/BEST.csv")
                             elif sell_cost == max(sell_cost_range) and rec == min(recovery_range) and i == max(discount_rate_range) and pc == max(plant_cost_range) and mc == max(mine_cost_range) and price == min(price_range):
                                 worst_mid_best_case(df_saved, f"{cases_folder}/WORST.csv")
-                            elif sell_cost == mid_list(sell_cost_range) and rec == mid_list(recovery_range) and i == mid_list(discount_rate_range) and pc == mid_list(plant_cost_range) and mc == mid_list(mine_cost_range) and price == mid_list(price_range):
-                                worst_mid_best_case(df_saved, f"{cases_folder}/MIDCASE.csv")
+                            elif sell_cost == list_percentage(sell_cost_range, 75) and rec == list_percentage(recovery_range, 25) and i == list_percentage(discount_rate_range, 25) and pc == list_percentage(plant_cost_range, 75) and mc == list_percentage(mine_cost_range, 75) and price == list_percentage(price_range, 25):
+                                worst_mid_best_case(df_saved, f"{cases_folder}/MIDCASE25.csv")
+                            elif sell_cost == list_percentage(sell_cost_range, 50) and rec == list_percentage(recovery_range, 50) and i == list_percentage(discount_rate_range, 50) and pc == list_percentage(plant_cost_range, 50) and mc == list_percentage(mine_cost_range, 50) and price == list_percentage(price_range, 50):
+                                worst_mid_best_case(df_saved, f"{cases_folder}/MIDCASE50.csv")
+                            elif sell_cost == list_percentage(sell_cost_range, 25) and rec == list_percentage(recovery_range, 75) and i == list_percentage(discount_rate_range, 75) and pc == list_percentage(plant_cost_range, 25) and mc == list_percentage(mine_cost_range, 25) and price == list_percentage(price_range, 75):
+                                worst_mid_best_case(df_saved, f"{cases_folder}/MIDCASE75.csv")
                             else:
                                 save_csv(df_saved, f"{iterations_path}/{csv_name}")
                             progress_bar['value'] = progress_index
@@ -341,9 +369,14 @@ def iterations():
                 d += 1
             r += 1
         sc += 1
+    
+    finish_iterations()
+    
+def finish_iterations():
     progress_bar['value'] = 0
     percentage.set("0.00 %")
     button_iterations.config(state='normal')
+    button_graph_footprint.config(state = 'normal')
 
 def clear_files(path):
     """
@@ -431,11 +464,67 @@ def worst_mid_best_case(df, file_name):
         os.makedirs(cases_folder)
     df.to_csv(file_name, index = False)
 
+def footprint_button():
+    footprint_graph_window()
+
+def build_graph_footprint():
+    dataframes_modified = []
+    z_height_footprint = combobox_cota_z.get()
+    for df in dataframes_study_cases:
+        dataframes_modified.append(df[df['z'] == int(z_height_footprint)])
+
+    plt.figure()
+    plt.scatter(dataframes_modified[0]['x'].tolist(), dataframes_modified[0]['y'].tolist(), s=250, color='#00ff00', label="Best Case")  # BEST CASE
+    plt.scatter(dataframes_modified[3]['x'].tolist(), dataframes_modified[3]['y'].tolist(), s=200, color='#40bf00', label="Q75 Case")  # MID 75 CASE
+    plt.scatter(dataframes_modified[2]['x'].tolist(), dataframes_modified[2]['y'].tolist(), s=150, color='#808000', label="Q50 Case")  # MID 50 CASE
+    plt.scatter(dataframes_modified[1]['x'].tolist(), dataframes_modified[1]['y'].tolist(), s=100, color='#bf4000', label="Q25 Case")  # MID 25 CASE
+    plt.scatter(dataframes_modified[4]['x'].tolist(), dataframes_modified[4]['y'].tolist(), s=50, color='#ff0000', label="Worst Case")  # WORST CASE
+    plt.title("Footprint Graph")
+    plt.legend()
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid(True)
+    plt.show()
+
+def footprint_graph_window():
+    def read_dataframes():
+        for file in os.listdir(cases_folder):
+            full_path = os.path.join(cases_folder, file)
+            if os.path.isfile(full_path):
+                df = pd.read_csv(full_path, sep=',')
+                dataframes_study_cases.append(df[df['antes_max'] == 1])
+
+    def set_options_combobox():
+        for df in dataframes_study_cases:
+            for element in df['z']:
+                if element not in options_footprint:
+                    options_footprint.append(element)
+    
+    footprint_window = tk.Toplevel(root)
+    footprint_window.title('Footprint Graph')
+    footprint_window.geometry('300x200')
+
+    read_dataframes()
+    set_options_combobox()
+
+    frame_new_window_z_height = tk.Frame(footprint_window)
+    frame_new_window_z_height.pack()
+    frame_new_window_graph = tk.Frame(footprint_window)
+    frame_new_window_graph.pack()
+    label_new_window_z_height = tk.Label(frame_new_window_z_height, text = 'Z Coordniates', font = ('Arial', 20))
+    label_new_window_z_height.pack()
+
+    global combobox_cota_z
+    combobox_cota_z = ttk.Combobox(frame_new_window_z_height, values = options_footprint, state='readonly', font = ('Arial', 20), width = 10, justify='center')
+    combobox_cota_z.pack()
+    boton_graficar = tk.Button(frame_new_window_z_height, text = 'Graficar', font = ('Arial', 20), command = build_graph_footprint)
+    boton_graficar.pack(pady=10)
+
 
 root = tk.Tk()
 root.title('Certidumbre')
 WINDOW_WIDTH = 1300
-WINDOW_HEIGHT = 800
+WINDOW_HEIGHT = 880
 root.geometry(f'{WINDOW_WIDTH}x{WINDOW_HEIGHT}')
 root.resizable(False, False)
 
@@ -634,5 +723,10 @@ percentage = tk.StringVar()
 label_percentage = tk.Label(frame_iterations, textvariable=percentage, bg=COLORFRAME1, fg='#ffffff', font=('Courier New', 10))
 label_percentage.pack(pady = 2)
 percentage.set("0.00 %")
+
+frame_graph_footprint = tk.Frame(frame_sensitivity, **button_frame_style)
+frame_graph_footprint.pack(pady = 15)
+button_graph_footprint = tk.Button(frame_graph_footprint, text = 'Graph', state='disabled', command = footprint_button, **button_style)
+button_graph_footprint.pack()
 
 root.mainloop()
