@@ -97,7 +97,9 @@ def list_percentage(lst: list, num: int):
     función entregará el numero justo en el primer cuarto de los
     elementos. Si 'num' es 0, entregará el primer elemento. Si 'num' es
     100, entregará el último elemento.\n
-    Parámetros
+    Parámetros:\n
+    * lst: Lista cualquiera.\n
+    * num: Porcentaje (num)%
     """
     if len(lst) == 0:
         return
@@ -373,6 +375,10 @@ def iterations():
     finish_iterations()
     
 def finish_iterations():
+    """
+    Deifne los parámetros que cambiarán luego de terminar
+    de iterar.
+    """
     progress_bar['value'] = 0
     percentage.set("0.00 %")
     button_iterations.config(state='normal')
@@ -449,6 +455,10 @@ def verify_iterations():
         iterations()
 
 def select_iterations_path():
+    """
+    Define la carpeta en donde se guardarán las
+    iteraciones.
+    """
     global cases_folder
     global iterations_path
     
@@ -465,9 +475,17 @@ def worst_mid_best_case(df, file_name):
     df.to_csv(file_name, index = False)
 
 def footprint_button():
+    """
+    Función ligada al botón "Graph", establece las funciones que
+    se ejecutarán tras presionar el botón.
+    """
     footprint_graph_window()
 
 def build_graph_footprint():
+    """
+    Creación del gráfico del footprint teniendo en cuenta la cota
+    seleccionada en el cuadro desplegable.
+    """
     dataframes_modified = []
     z_height_footprint = combobox_cota_z.get()
     for df in dataframes_study_cases:
@@ -487,7 +505,13 @@ def build_graph_footprint():
     plt.show()
 
 def footprint_graph_window():
+    """
+    Crea la ventana nueva al presionar el botón 'Graph'.
+    """
     def read_dataframes():
+        """
+        Lee los archivos .csv (Best Case, Worst Case y cuartiles 25 50 y 75).
+        """
         for file in os.listdir(cases_folder):
             full_path = os.path.join(cases_folder, file)
             if os.path.isfile(full_path):
@@ -495,6 +519,9 @@ def footprint_graph_window():
                 dataframes_study_cases.append(df[df['antes_max'] == 1])
 
     def set_options_combobox():
+        """
+        Configura las opciones del texto desplegable
+        """
         for df in dataframes_study_cases:
             for element in df['z']:
                 if element not in options_footprint:
