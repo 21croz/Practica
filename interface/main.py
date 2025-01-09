@@ -9,6 +9,7 @@ from matplotlib.figure import Figure                            # Importa la cla
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg # Importa la clase FigureCanvasTkAgg de la librería de graficación.
 from math import floor                                          # Importa el paquete floor de la librería math, usado para los cálculos.
 from itertools import product                                   # Importa el paquete product de la librería itertools, usado para las iteraciones.
+from time import time                                           # Importa el paquete time de la libreria time, usada para el cálculo de la demora en las iteraciones.
 
 
 
@@ -38,6 +39,8 @@ class MainApp(tk.Tk):
 
     def create_control_variables(self):
         """Crea las variables de control de la ventana"""
+        self.number_verification = self.register(self.validate_entries)
+        self.str_eta = tk.StringVar()
         self.combo_values = []
         self.loaded_dataframe = None
         self.list_entries = []
@@ -90,9 +93,9 @@ class MainApp(tk.Tk):
         self.label_price_min = tk.Label(self.frame_price, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_price_max = tk.Label(self.frame_price, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_price_step = tk.Label(self.frame_price, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_price_min = tk.Entry(self.frame_price, width = 5)
-        self.entry_price_max = tk.Entry(self.frame_price, width = 5)
-        self.entry_price_step = tk.Entry(self.frame_price, width = 5)
+        self.entry_price_min = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_price_max = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_price_step = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
         self.frame_minecost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
@@ -101,9 +104,9 @@ class MainApp(tk.Tk):
         self.label_minecost_min = tk.Label(self.frame_minecost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_minecost_max = tk.Label(self.frame_minecost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_minecost_step = tk.Label(self.frame_minecost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_minecost_min = tk.Entry(self.frame_minecost, width = 5)
-        self.entry_minecost_max = tk.Entry(self.frame_minecost, width = 5)
-        self.entry_minecost_step = tk.Entry(self.frame_minecost, width = 5)
+        self.entry_minecost_min = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_minecost_max = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_minecost_step = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
         self.frame_plantcost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
@@ -112,9 +115,9 @@ class MainApp(tk.Tk):
         self.label_plantcost_min = tk.Label(self.frame_plantcost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_plantcost_max = tk.Label(self.frame_plantcost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_plantcost_step = tk.Label(self.frame_plantcost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_plantcost_min = tk.Entry(self.frame_plantcost, width = 5)
-        self.entry_plantcost_max = tk.Entry(self.frame_plantcost, width = 5)
-        self.entry_plantcost_step = tk.Entry(self.frame_plantcost, width = 5)
+        self.entry_plantcost_min = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_plantcost_max = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_plantcost_step = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
         self.frame_discountrate = tk.Frame(self.frame_control, bg = self.BG_COLOR)
@@ -123,9 +126,9 @@ class MainApp(tk.Tk):
         self.label_discountrate_min = tk.Label(self.frame_discountrate, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_discountrate_max = tk.Label(self.frame_discountrate, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_discountrate_step = tk.Label(self.frame_discountrate, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_discountrate_min = tk.Entry(self.frame_discountrate, width = 5)
-        self.entry_discountrate_max = tk.Entry(self.frame_discountrate, width = 5)
-        self.entry_discountrate_step = tk.Entry(self.frame_discountrate, width = 5)
+        self.entry_discountrate_min = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_discountrate_max = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_discountrate_step = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
         self.frame_recovery = tk.Frame(self.frame_control, bg = self.BG_COLOR)
@@ -134,9 +137,9 @@ class MainApp(tk.Tk):
         self.label_recovery_min = tk.Label(self.frame_recovery, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_recovery_max = tk.Label(self.frame_recovery, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_recovery_step = tk.Label(self.frame_recovery, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_recovery_min = tk.Entry(self.frame_recovery, width = 5)
-        self.entry_recovery_max = tk.Entry(self.frame_recovery, width = 5)
-        self.entry_recovery_step = tk.Entry(self.frame_recovery, width = 5)
+        self.entry_recovery_min = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_recovery_max = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_recovery_step = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
         self.frame_sellcost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
@@ -145,17 +148,19 @@ class MainApp(tk.Tk):
         self.label_sellcost_min = tk.Label(self.frame_sellcost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
         self.label_sellcost_max = tk.Label(self.frame_sellcost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
         self.label_sellcost_step = tk.Label(self.frame_sellcost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
-        self.entry_sellcost_min = tk.Entry(self.frame_sellcost, width = 5)
-        self.entry_sellcost_max = tk.Entry(self.frame_sellcost, width = 5)
-        self.entry_sellcost_step = tk.Entry(self.frame_sellcost, width = 5)
+        self.entry_sellcost_min = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_sellcost_max = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
+        self.entry_sellcost_step = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
         
         self.button_iterate = AppButton(self.frame_control, text = 'Iterate', command = self.sensitivity_analysis)
 
         self.progressbar_iterations = ttk.Progressbar(self.frame_control, orient='horizontal', length = 200)
         self.label_progressbar_percentage = tk.Label(self.frame_control, textvariable = self.progressbar_percentage, font = ('Courier New', 8), bg = self.BG_COLOR, fg = 'white')
+        self.label_eta = tk.Label(self.frame_control, textvariable = self.str_eta, font = ('Courier New', 8), bg = self.BG_COLOR, fg = 'white')
 
         self.progressbar_percentage.set("0.0 %")
+        self.str_eta.set('0d 0h 0m 0s')
 
 
     def widgets_layout(self):
@@ -250,7 +255,18 @@ class MainApp(tk.Tk):
 
         self.button_iterate.pack(pady = (45, 5), padx = 10)
         self.progressbar_iterations.pack(padx = 10)
-        self.label_progressbar_percentage.pack(padx = 10)
+        self.label_progressbar_percentage.place(x = 280, y = 761)
+        self.label_eta.pack()
+
+
+    def validate_entries(self, text):
+        if text == '':
+            return True
+        try:
+            float(text)
+            return True
+        except ValueError:
+            return False
 
 
     def list_entries_append(self):
@@ -377,7 +393,7 @@ class MainApp(tk.Tk):
             string_files_size = f'{(files_size/1024):,.2f}'.replace(',', '.')
             string_files_size += ' Tb'
 
-        iterate_time = self.convert_time(file_number*305/5511)
+        iterate_time = self.convert_time(file_number*0.25)
 
         answer = messagebox.askyesno(
             'Warning',
@@ -450,9 +466,13 @@ class MainApp(tk.Tk):
         combinations = self.create_combinations(parameters_ranges)
 
         self.progressbar_iterations['maximum'] = self.number_of_files
+        total_files, total_folder_size = self.iterations_result_files()
+        total_folder_size *= (1024*1024)
+        aprox_file_size = 1200
         progress_index = 1
 
         for price, m_cost, p_cost, discount, recov, sell_c in combinations:
+            t1 = time()
             saved_data = {
                 'x': self.loaded_dataframe[self.combo_x.get()],
                 'y': self.loaded_dataframe[self.combo_y.get()],
@@ -479,6 +499,13 @@ class MainApp(tk.Tk):
                 case = ''
 
             self.save_file(df_saved, file_name, normal = True)
+
+            t2 = time() - t1
+
+            # Se actualiza el tiempo aproximado para realizar las iteraciones
+            total_time = t2*total_folder_size/aprox_file_size
+            self.str_eta.set(self.convert_time(total_time))
+            total_folder_size -= aprox_file_size
 
             # Se actualiza la barra de progreso
             self.progressbar_iterations['value'] = progress_index
@@ -649,6 +676,7 @@ class MainApp(tk.Tk):
         self.progressbar_percentage.set('0.0 %')
         self.menu_graph.entryconfig(0, state = 'normal')
         self.iterations_done = True
+        self.str_eta.set('0d 0h 0m 0s')
         
         # Mensaje de término del proceso de iteracion.
         messagebox.showinfo('SUCCESS', 'Iterations completed')
