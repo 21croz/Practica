@@ -18,7 +18,8 @@ class MainApp(tk.Tk):
 
     WINDOW_HEIGHT = 850
     WINDOW_WIDTH = 1250
-    BG_COLOR = '#2d3436'
+    BG_LEFT_COLOR = '#2d3436'
+    BG_RIGHT_COLOR = '#636e72'
 
     def __init__(self):
         """Constructor de la aplicación"""
@@ -65,89 +66,89 @@ class MainApp(tk.Tk):
 
     def widgets_create(self):
         """Crea los widgets de la ventana"""
-        self.frame_control = tk.Frame(self, width = self.WINDOW_WIDTH//3, bg = self.BG_COLOR)
-        self.frame_graph = tk.Frame(self, width = self.WINDOW_WIDTH*2//3, bg = '#636e72')
+        self.frame_control = tk.Frame(self, width = self.WINDOW_WIDTH//3, bg = self.BG_LEFT_COLOR)
+        self.frame_graph = tk.Frame(self, width = self.WINDOW_WIDTH*2//3, bg = self.BG_RIGHT_COLOR)
 
 
-        self.frame_combo = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_combo = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_combo_x = tk.Label(self.frame_combo, text = 'X Coordinate', bg = self.BG_COLOR, fg = 'white')
-        self.label_combo_y = tk.Label(self.frame_combo, text = 'Y Coordinate', bg = self.BG_COLOR, fg = 'white')
-        self.label_combo_z = tk.Label(self.frame_combo, text = 'Z Coordinate', bg = self.BG_COLOR, fg = 'white')
-        self.label_combo_cu = tk.Label(self.frame_combo, text = 'Metal grade', bg = self.BG_COLOR, fg = 'white')
+        self.label_combo_x = tk.Label(self.frame_combo, text = 'X Coordinate', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_combo_y = tk.Label(self.frame_combo, text = 'Y Coordinate', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_combo_z = tk.Label(self.frame_combo, text = 'Z Coordinate', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_combo_cu = tk.Label(self.frame_combo, text = 'Metal grade', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.combo_x = ttk.Combobox(self.frame_combo, values = self.combo_values, state = 'readonly', width = 10, justify = 'center')
         self.combo_y = ttk.Combobox(self.frame_combo, values = self.combo_values, state = 'readonly', width = 10, justify = 'center')
         self.combo_z = ttk.Combobox(self.frame_combo, values = self.combo_values, state = 'readonly', width = 10, justify = 'center')
         self.combo_cu = ttk.Combobox(self.frame_combo, values = self.combo_values, state = 'readonly', width = 10, justify = 'center')
 
 
-        self.frame_graph_buttons = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_graph_buttons = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
         self.button_3d_graph = AppButton(self.frame_graph_buttons, text = '3D Graph', command = self.plot_columns_3d)
         self.button_footprint_graph = AppButton(self.frame_graph_buttons, text = 'Footprint Graph', command = self.plot_footprint)
 
 
-        self.frame_price = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_price = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_price = tk.Label(self.frame_price, text = 'Price (usd/lb)', bg = self.BG_COLOR, fg = 'white')
-        self.label_price_min = tk.Label(self.frame_price, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_price_max = tk.Label(self.frame_price, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_price_step = tk.Label(self.frame_price, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_price = tk.Label(self.frame_price, text = 'Price (usd/lb)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_price_min = tk.Label(self.frame_price, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_price_max = tk.Label(self.frame_price, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_price_step = tk.Label(self.frame_price, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_price_min = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_price_max = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_price_step = tk.Entry(self.frame_price, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
-        self.frame_minecost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_minecost = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_minecost = tk.Label(self.frame_minecost, text = 'Mine cost (usd/ton)', bg = self.BG_COLOR, fg = 'white')
-        self.label_minecost_min = tk.Label(self.frame_minecost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_minecost_max = tk.Label(self.frame_minecost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_minecost_step = tk.Label(self.frame_minecost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_minecost = tk.Label(self.frame_minecost, text = 'Mine cost (usd/ton)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_minecost_min = tk.Label(self.frame_minecost, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_minecost_max = tk.Label(self.frame_minecost, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_minecost_step = tk.Label(self.frame_minecost, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_minecost_min = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_minecost_max = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_minecost_step = tk.Entry(self.frame_minecost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
-        self.frame_plantcost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_plantcost = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_plantcost = tk.Label(self.frame_plantcost, text = 'Plant cost (usd/ton)', bg = self.BG_COLOR, fg = 'white')
-        self.label_plantcost_min = tk.Label(self.frame_plantcost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_plantcost_max = tk.Label(self.frame_plantcost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_plantcost_step = tk.Label(self.frame_plantcost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_plantcost = tk.Label(self.frame_plantcost, text = 'Plant cost (usd/ton)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_plantcost_min = tk.Label(self.frame_plantcost, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_plantcost_max = tk.Label(self.frame_plantcost, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_plantcost_step = tk.Label(self.frame_plantcost, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_plantcost_min = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_plantcost_max = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_plantcost_step = tk.Entry(self.frame_plantcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
-        self.frame_discountrate = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_discountrate = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_discountrate = tk.Label(self.frame_discountrate, text = 'Discount rate (%)', bg = self.BG_COLOR, fg = 'white')
-        self.label_discountrate_min = tk.Label(self.frame_discountrate, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_discountrate_max = tk.Label(self.frame_discountrate, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_discountrate_step = tk.Label(self.frame_discountrate, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_discountrate = tk.Label(self.frame_discountrate, text = 'Discount rate (%)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_discountrate_min = tk.Label(self.frame_discountrate, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_discountrate_max = tk.Label(self.frame_discountrate, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_discountrate_step = tk.Label(self.frame_discountrate, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_discountrate_min = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_discountrate_max = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_discountrate_step = tk.Entry(self.frame_discountrate, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
-        self.frame_recovery = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_recovery = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_recovery = tk.Label(self.frame_recovery, text = 'Recovery (%)', bg = self.BG_COLOR, fg = 'white')
-        self.label_recovery_min = tk.Label(self.frame_recovery, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_recovery_max = tk.Label(self.frame_recovery, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_recovery_step = tk.Label(self.frame_recovery, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_recovery = tk.Label(self.frame_recovery, text = 'Recovery (%)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_recovery_min = tk.Label(self.frame_recovery, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_recovery_max = tk.Label(self.frame_recovery, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_recovery_step = tk.Label(self.frame_recovery, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_recovery_min = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_recovery_max = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_recovery_step = tk.Entry(self.frame_recovery, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
 
 
-        self.frame_sellcost = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_sellcost = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
-        self.label_sellcost = tk.Label(self.frame_sellcost, text = 'Selling cost (usd/ton)', bg = self.BG_COLOR, fg = 'white')
-        self.label_sellcost_min = tk.Label(self.frame_sellcost, text = 'Min', bg = self.BG_COLOR, fg = 'white')
-        self.label_sellcost_max = tk.Label(self.frame_sellcost, text = 'Max', bg = self.BG_COLOR, fg = 'white')
-        self.label_sellcost_step = tk.Label(self.frame_sellcost, text = 'Step', bg = self.BG_COLOR, fg = 'white')
+        self.label_sellcost = tk.Label(self.frame_sellcost, text = 'Selling cost (usd/ton)', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_sellcost_min = tk.Label(self.frame_sellcost, text = 'Min', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_sellcost_max = tk.Label(self.frame_sellcost, text = 'Max', bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_sellcost_step = tk.Label(self.frame_sellcost, text = 'Step', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.entry_sellcost_min = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_sellcost_max = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
         self.entry_sellcost_step = tk.Entry(self.frame_sellcost, width = 5, justify = 'center', validate = 'key', validatecommand = (self.number_verification, '%P'))
@@ -156,8 +157,8 @@ class MainApp(tk.Tk):
         self.button_iterate = AppButton(self.frame_control, text = 'Iterate', command = self.sensitivity_analysis)
 
         self.progressbar_iterations = ttk.Progressbar(self.frame_control, orient='horizontal', length = 200)
-        self.label_progressbar_percentage = tk.Label(self.frame_control, textvariable = self.progressbar_percentage, font = ('Courier New', 8), bg = self.BG_COLOR, fg = 'white')
-        self.label_eta = tk.Label(self.frame_control, textvariable = self.str_eta, font = ('Courier New', 8), bg = self.BG_COLOR, fg = 'white')
+        self.label_progressbar_percentage = tk.Label(self.frame_control, textvariable = self.progressbar_percentage, font = ('Courier New', 8), bg = self.BG_LEFT_COLOR, fg = 'white')
+        self.label_eta = tk.Label(self.frame_control, textvariable = self.str_eta, font = ('Courier New', 8), bg = self.BG_LEFT_COLOR, fg = 'white')
 
         self.progressbar_percentage.set("0.0 %")
         self.str_eta.set('0d 0h 0m 0s')
@@ -812,7 +813,8 @@ class FootprintWindow(tk.Toplevel):
     
     WINDOW_WIDTH = 900
     WINDOW_HEIGHT = 600
-    BG_COLOR = '#2d3436'
+    BG_LEFT_COLOR = '#2d3436'
+    BG_RIGHT_COLOR = '#636e72'
 
     def __init__(self, parent):
         """Constructor de la ventana"""
@@ -844,18 +846,18 @@ class FootprintWindow(tk.Toplevel):
 
     def create_widgets(self):
         """Esta funcion crea los widgets que se verán en la ventana."""
-        self.frame_control = tk.Frame(self, bg = self.BG_COLOR, width = self.WINDOW_WIDTH // 3)
-        self.frame_graph = tk.Frame(self, bg = '#636e72', width = self.WINDOW_WIDTH * 2 // 3)
+        self.frame_control = tk.Frame(self, bg = self.BG_LEFT_COLOR, width = self.WINDOW_WIDTH // 3)
+        self.frame_graph = tk.Frame(self, bg = self.BG_RIGHT_COLOR, width = self.WINDOW_WIDTH * 2 // 3)
 
-        self.label_level = tk.Label(self.frame_control, text = 'Height Z', bg = self.BG_COLOR, fg = 'white')
+        self.label_level = tk.Label(self.frame_control, text = 'Height Z', bg = self.BG_LEFT_COLOR, fg = 'white')
         self.combo_level = ttk.Combobox(self.frame_control, values = self.heights, state = 'readonly', width = 10)
 
         self.check_state = [tk.BooleanVar(value = False) for _ in range(5)]
 
-        self.frame_check = tk.Frame(self.frame_control, bg = self.BG_COLOR)
+        self.frame_check = tk.Frame(self.frame_control, bg = self.BG_LEFT_COLOR)
 
         for i, label in enumerate(self.check_names):
-            self.label = tk.Label(self.frame_check, text = label, bg = self.BG_COLOR, fg = 'white')
+            self.label = tk.Label(self.frame_check, text = label, bg = self.BG_LEFT_COLOR, fg = 'white')
             self.label.grid(row = i, column = 0)
             self.checkbutton_filter = ttk.Checkbutton(self.frame_check, variable = self.check_state[i])
             self.checkbutton_filter.grid(row = i, column = 1, pady = 5)
