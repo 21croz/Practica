@@ -52,7 +52,7 @@ class MainApp(tk.Tk):
         self.menu_file = tk.Menu(self.menu_bar, tearoff = 0)
         self.menu_file.add_command(label = 'Select File', command = self.select_file)
         self.menu_file.add_separator()
-        self.menu_file.add_command(label = 'Exit', command = lambda: self.destroy())
+        self.menu_file.add_command(label = 'Exit', command = self.on_closing)
         self.menu_bar.add_cascade(label = 'File', menu = self.menu_file)
         self.menu_graph = tk.Menu(self.menu_bar, tearoff = 0)
         self.menu_graph.add_command(label = 'Footprint Graph', command = self.open_footprint_window, state = 'normal')
@@ -431,7 +431,7 @@ class MainApp(tk.Tk):
 
         total_length = len(elements_in_range[0])*len(elements_in_range[1])*len(elements_in_range[2])*len(elements_in_range[3])*len(elements_in_range[4])*len(elements_in_range[5])
         
-        return total_length, ((total_length + 5)*1000/1024)/1024
+        return total_length, ((total_length + 5)*1200/1024)/1024
 
 
     def iterations(self):
@@ -468,7 +468,7 @@ class MainApp(tk.Tk):
 
             df_saved['value'] = self.calculate_block_value(price, sell_c, volume, 2.7, recov, df_saved['grade'], m_cost, p_cost)
             df_saved['disc_value'] = df_saved['value']/((1 + discount/100) ** df_saved['period'])
-            df_saved['antes_max'] = (df_saved['value'] > 0).astype(int)
+            df_saved = self.set_antes_max(df_saved)
 
             file_name = f'p{price}mc{m_cost}pc{p_cost}d{discount}r{recov}sc{sell_c}.csv'
 
@@ -489,7 +489,7 @@ class MainApp(tk.Tk):
         self.finish_iterate()
 
 
-    def set_antes_max(self, df):
+    def set_antes_max(self, df): # NOT USED YET
         """
         Esta funcion modifica la columna 'antes_max' del dataframe.
         * Se hace un filtro en cada elemento, se agrupan los que tienen igual coordenada (x, y), de esta forma se aisla cada columna.
@@ -497,8 +497,27 @@ class MainApp(tk.Tk):
         * Se identifica el valor máximo del valor acumulado en cada columna.
         * Se asigna el valor de 1 a cada fila de la columna, desde la base hasta el valor máximo encontrado.
         """
+        column_dataframes = []
 
-        return
+        try:
+            df['antes_max'] = 0
+
+            grouped = df.groupby(['x', 'y'])
+
+            for _, group in grouped:
+                column_dataframes.append(group)
+                group['valor_acum'] = group['disc_value'].cumsum()
+            
+            for df in column_dataframes:
+                max_valor_acum = df[df['valor_acum'] > 0]['valor_acum'].max()
+                if pd.notna(max_valor_acum):
+                    max_index = df[df['valor_acum'] == max_valor_acum].index[0]
+                    df.loc[:max_index, 'antes_max'] = 1
+
+        except Exception:
+            messagebox.showerror("Error", "An error has happened when trying to read files in 'cases'")
+
+        return pd.concat(column_dataframes, ignore_index = True)
 
 
     def list_percentage(self, lst:list, perc:tuple|int):
@@ -626,11 +645,13 @@ class MainApp(tk.Tk):
 
     def finish_iterate(self):
         """Esta función se ejecuta al terminar las iteraciones"""
-        messagebox.showinfo('SUCCESS', 'Iterations completed')
         self.progressbar_iterations['value'] = 0
         self.progressbar_percentage.set('0.0 %')
         self.menu_graph.entryconfig(0, state = 'normal')
         self.iterations_done = True
+        
+        # Mensaje de término del proceso de iteracion.
+        messagebox.showinfo('SUCCESS', 'Iterations completed')
 
 
     def verify_folder(self):
@@ -845,6 +866,7 @@ class FootprintWindow(tk.Toplevel):
     def define_coordinates(self):
         """Esta funcion filtra las coordenadas de los dataframes de acuerdo con la coordenada Z que se
         ingrese en el menú desplegable, ubicado en la parte superior izquierda de la ventana"""
+        self.coordinates = []
         for df in self.dataframes:
             self.coordinates.append(df[df['z'] == int(self.combo_level.get())])
 
@@ -897,8 +919,8 @@ class AppButton(tk.Frame):
         super().__init__(parent, *args, **kwargs)
         self.config(
             highlightbackground = '#e84393',    # Color del borde del botón
-            highlightthickness = 2,             # Grosor del borde al pasar el mouse
-            bd = 0                              # Grosor del borde
+            highlightthickness = 2,             # Grosor del borde del botón
+            bd = 0                              # Borde del frame
             )
 
         button = tk.Button(
